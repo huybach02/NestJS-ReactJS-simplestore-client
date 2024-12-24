@@ -14,13 +14,11 @@ import {Grid} from "antd";
 import Link from "next/link";
 import {RegisterType} from "@/types/authType";
 import {authService} from "@/service/authService";
-import {setUser} from "@/redux/slice/userSlice";
-import {useDispatch} from "react-redux";
 import {useRouter} from "next/router";
+import CheckAuthenticated from "@/components/CheckAuthenticated";
 
 const Register = () => {
   const router = useRouter();
-  const dispatch = useDispatch();
 
   const {lg} = Grid.useBreakpoint();
 
@@ -33,8 +31,7 @@ const Register = () => {
       setIsLoading(true);
       const response = await authService.register(values);
       if (response?.success) {
-        dispatch(setUser(response?.data));
-        router.push("/");
+        router.push("/auth/verified?email=" + response?.data?.email);
       }
     } catch (error) {
       console.log(error);
@@ -191,4 +188,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default CheckAuthenticated(Register);

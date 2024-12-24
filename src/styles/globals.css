@@ -4,3 +4,8 @@
   box-sizing: border-box;
   font-family: "Poppins", sans-serif !important;
 }
+
+.ant-drawer-body .ant-menu-item-selected {
+  background-color: #000 !important;
+  color: #fff !important;
+}

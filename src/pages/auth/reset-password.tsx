@@ -1,8 +1,7 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {
   Button,
   Card,
-  Checkbox,
   Col,
   Flex,
   Form,
@@ -14,36 +13,29 @@ import {
 import {Grid} from "antd";
 import Link from "next/link";
 import {useRouter} from "next/router";
-import {useDispatch} from "react-redux";
-import {setUser} from "@/redux/slice/userSlice";
 import {authService} from "../../service/authService";
-import {LoginType} from "@/types/authType";
 import CheckAuthenticated from "@/components/CheckAuthenticated";
-import SocialLogin from "@/components/SocialLogin";
 
-const Login = () => {
+const ResetPassword = () => {
   const router = useRouter();
-  const dispatch = useDispatch();
 
   const {lg} = Grid.useBreakpoint();
 
   const [isLoading, setIsLoading] = useState(false);
-  const [isRemember, setIsRemember] = useState(false);
+  const [countdown, setCountdown] = useState(60);
 
   const [form] = Form.useForm();
 
-  const handleSubmit = async (values: LoginType) => {
+  const handleSubmit = async (values: {otp: string; password: string}) => {
     try {
       setIsLoading(true);
-      const response = await authService.login({
-        ...values,
-        remember: isRemember,
+      const response = await authService.resetPassword({
+        email: router.query.email as string,
+        otp: values.otp,
+        password: values.password,
       });
       if (response?.success) {
-        dispatch(setUser(response?.data));
-        router.push("/");
-      } else {
-        router.push("/auth/verified?email=" + response?.data?.email);
+        router.push("/auth/login");
       }
     } catch (error) {
       console.log(error);
@@ -51,6 +43,35 @@ const Login = () => {
       setIsLoading(false);
     }
   };
+
+  const handleResendOTP = async () => {
+    try {
+      setIsLoading(true);
+      const response = await authService.forgotPassword({
+        email: router.query.email as string,
+      });
+      if (response?.success) {
+        setCountdown(60);
+        router.push("/auth/reset-password?email=" + router.query.email);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (countdown > 0) {
+      timer = setInterval(() => {
+        setCountdown((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => {
+      if (timer) clearInterval(timer);
+    };
+  }, [countdown]);
 
   return (
     <Row
@@ -83,7 +104,7 @@ const Login = () => {
             style={{
               objectFit: "cover",
             }}
-            src={process.env.NEXT_PUBLIC_APP_IMAGE_LOGIN_PAGE}
+            src={process.env.NEXT_PUBLIC_APP_IMAGE_VERIFY_PAGE}
             preview={false}
           />
         </Flex>
@@ -130,8 +151,13 @@ const Login = () => {
               level={3}
               style={{textAlign: "center", marginBottom: 24}}
             >
-              Login
+              Reset Password
             </Typography.Title>
+            <p style={{textAlign: "center", marginBottom: 24}}>
+              We have sent a verification code to <br />{" "}
+              <b>{router.query.email}</b>. <br />
+              Please enter the code below to reset your password.
+            </p>
             <Form
               form={form}
               onFinish={handleSubmit}
@@ -139,23 +165,48 @@ const Login = () => {
               size="large"
               disabled={isLoading}
             >
-              <Form.Item label="Email" name="email" rules={[{required: true}]}>
-                <Input placeholder="example@gmail.com" />
+              <Form.Item label="OTP" name="otp" rules={[{required: true}]}>
+                <Input.OTP />
               </Form.Item>
+              <Flex justify="end">
+                <Button
+                  size="small"
+                  type="default"
+                  onClick={handleResendOTP}
+                  disabled={countdown > 0 || isLoading}
+                >
+                  {countdown > 0
+                    ? `Send OTP again in ${countdown}s`
+                    : "Send OTP again"}
+                </Button>
+              </Flex>
               <Form.Item
-                label="Password"
+                label="New Password"
                 name="password"
                 rules={[{required: true}]}
               >
-                <Input.Password placeholder="********" />
+                <Input.Password />
               </Form.Item>
-              <Form.Item name="remember" valuePropName="checked">
-                <Checkbox
-                  checked={isRemember}
-                  onChange={(e) => setIsRemember(e.target.checked)}
-                >
-                  Remember me for 30 days
-                </Checkbox>
+              <Form.Item
+                label="Confirm Password"
+                name="confirmPassword"
+                rules={[
+                  {required: true},
+                  ({getFieldValue}) => ({
+                    validator(_, value) {
+                      if (!value || getFieldValue("password") === value) {
+                        return Promise.resolve();
+                      }
+                      return Promise.reject(
+                        new Error(
+                          "The two passwords that you entered do not match!"
+                        )
+                      );
+                    },
+                  }),
+                ]}
+              >
+                <Input.Password />
               </Form.Item>
               <Form.Item>
                 <Button
@@ -164,27 +215,9 @@ const Login = () => {
                   style={{width: "100%", padding: "20px 0", marginTop: 5}}
                   loading={isLoading}
                 >
-                  Login
+                  Reset Password
                 </Button>
               </Form.Item>
-              <SocialLogin />
-              <Flex
-                vertical
-                gap={10}
-                style={{textAlign: "center", marginTop: 20}}
-              >
-                <Button
-                  type="link"
-                  size="small"
-                  onClick={() => router.push("/auth/forgot-password")}
-                >
-                  Forgot password?
-                </Button>
-                <Typography.Text>
-                  Don&apos;t have an account?{" "}
-                  <Link href="/auth/register">Register</Link>
-                </Typography.Text>
-              </Flex>
             </Form>
           </Card>
         </Flex>
@@ -193,4 +226,4 @@ const Login = () => {
   );
 };
 
-export default CheckAuthenticated(Login);
+export default CheckAuthenticated(ResetPassword);

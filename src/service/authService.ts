@@ -47,4 +47,35 @@ export const authService = {
       console.log(error);
     }
   },
+
+  verifyOtp: async (data: {email: string; otp: string}) => {
+    try {
+      return await axiosInstance.post("/auth/verify-otp", data);
+    } catch (error: any) {
+      message.error(error.response.data.message);
+      return Promise.reject(error);
+    }
+  },
+
+  forgotPassword: async (data: {email: string}) => {
+    try {
+      return await axiosInstance.post("/auth/forgot-password", data);
+    } catch (error: any) {
+      message.error(error.response.data.message);
+      return Promise.reject(error);
+    }
+  },
+
+  resetPassword: async (data: {
+    email: string;
+    otp: string;
+    password: string;
+  }) => {
+    try {
+      return await axiosInstance.post("/auth/reset-password", data);
+    } catch (error: any) {
+      message.error(error.response.data.message);
+      return Promise.reject(error);
+    }
+  },
 };

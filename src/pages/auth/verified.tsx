@@ -2,7 +2,6 @@ import React, {useState} from "react";
 import {
   Button,
   Card,
-  Checkbox,
   Col,
   Flex,
   Form,
@@ -17,33 +16,28 @@ import {useRouter} from "next/router";
 import {useDispatch} from "react-redux";
 import {setUser} from "@/redux/slice/userSlice";
 import {authService} from "../../service/authService";
-import {LoginType} from "@/types/authType";
 import CheckAuthenticated from "@/components/CheckAuthenticated";
-import SocialLogin from "@/components/SocialLogin";
 
-const Login = () => {
+const Verified = () => {
   const router = useRouter();
   const dispatch = useDispatch();
 
   const {lg} = Grid.useBreakpoint();
 
   const [isLoading, setIsLoading] = useState(false);
-  const [isRemember, setIsRemember] = useState(false);
 
   const [form] = Form.useForm();
 
-  const handleSubmit = async (values: LoginType) => {
+  const handleSubmit = async (values: {otp: string}) => {
     try {
       setIsLoading(true);
-      const response = await authService.login({
-        ...values,
-        remember: isRemember,
+      const response = await authService.verifyOtp({
+        email: router.query.email as string,
+        otp: values.otp,
       });
       if (response?.success) {
         dispatch(setUser(response?.data));
         router.push("/");
-      } else {
-        router.push("/auth/verified?email=" + response?.data?.email);
       }
     } catch (error) {
       console.log(error);
@@ -83,7 +77,7 @@ const Login = () => {
             style={{
               objectFit: "cover",
             }}
-            src={process.env.NEXT_PUBLIC_APP_IMAGE_LOGIN_PAGE}
+            src={process.env.NEXT_PUBLIC_APP_IMAGE_VERIFY_PAGE}
             preview={false}
           />
         </Flex>
@@ -130,7 +124,7 @@ const Login = () => {
               level={3}
               style={{textAlign: "center", marginBottom: 24}}
             >
-              Login
+              Verify OTP
             </Typography.Title>
             <Form
               form={form}
@@ -139,23 +133,8 @@ const Login = () => {
               size="large"
               disabled={isLoading}
             >
-              <Form.Item label="Email" name="email" rules={[{required: true}]}>
-                <Input placeholder="example@gmail.com" />
-              </Form.Item>
-              <Form.Item
-                label="Password"
-                name="password"
-                rules={[{required: true}]}
-              >
-                <Input.Password placeholder="********" />
-              </Form.Item>
-              <Form.Item name="remember" valuePropName="checked">
-                <Checkbox
-                  checked={isRemember}
-                  onChange={(e) => setIsRemember(e.target.checked)}
-                >
-                  Remember me for 30 days
-                </Checkbox>
+              <Form.Item label="OTP" name="otp" rules={[{required: true}]}>
+                <Input.OTP />
               </Form.Item>
               <Form.Item>
                 <Button
@@ -164,27 +143,9 @@ const Login = () => {
                   style={{width: "100%", padding: "20px 0", marginTop: 5}}
                   loading={isLoading}
                 >
-                  Login
+                  Verify my account
                 </Button>
               </Form.Item>
-              <SocialLogin />
-              <Flex
-                vertical
-                gap={10}
-                style={{textAlign: "center", marginTop: 20}}
-              >
-                <Button
-                  type="link"
-                  size="small"
-                  onClick={() => router.push("/auth/forgot-password")}
-                >
-                  Forgot password?
-                </Button>
-                <Typography.Text>
-                  Don&apos;t have an account?{" "}
-                  <Link href="/auth/register">Register</Link>
-                </Typography.Text>
-              </Flex>
             </Form>
           </Card>
         </Flex>
@@ -193,4 +154,4 @@ const Login = () => {
   );
 };
 
-export default CheckAuthenticated(Login);
+export default CheckAuthenticated(Verified);

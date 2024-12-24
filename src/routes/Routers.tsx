@@ -46,7 +46,7 @@ const Routers = ({Component, pageProps}: RouterProps) => {
     </Layout>
   ) : (
     <Layout>
-      <Layout.Header style={{backgroundColor: "#fff"}}>
+      <Layout.Header style={{backgroundColor: "#fff", paddingTop: "20px"}}>
         <HeaderCustom />
       </Layout.Header>
       <Layout.Content style={{backgroundColor: "#fff"}}>
