@@ -7,6 +7,7 @@ import {baseService} from "@/service/baseService";
 import {handleTreeValueCustom} from "@/utils/handleTreeValue";
 import {
   Avatar,
+  Badge,
   Button,
   Col,
   Divider,
@@ -45,6 +46,8 @@ const HeaderCustom = () => {
   const [categories, setCategories] = useState<any[]>([]);
   const [categoriesCustom, setCategoriesCustom] = useState<any[]>([]);
   const [currentPath, setCurrentPath] = useState<string>("home");
+  const [check, setCheck] = useState<boolean>(false);
+
   const [open, setOpen] = useState<boolean>(false);
 
   const items: MenuProps["items"] = [
@@ -120,7 +123,7 @@ const HeaderCustom = () => {
     }
 
     setOpen(false);
-  }, [router.pathname]);
+  }, [router.pathname, check]);
 
   return (
     <>
@@ -159,15 +162,15 @@ const HeaderCustom = () => {
               {
                 label: (
                   <Dropdown menu={{items: categories}}>
-                    <a onClick={(e) => e.preventDefault()}>
+                    <Link href="/shop">
                       <Flex align="center" gap={5}>
                         Shop
                         <FaCaretDown />
                       </Flex>
-                    </a>
+                    </Link>
                   </Dropdown>
                 ),
-                key: "categories",
+                key: "categories/[id]",
               },
               {
                 label: <Link href="/about-us">About Us</Link>,
@@ -205,11 +208,19 @@ const HeaderCustom = () => {
                 display: !lg ? "none" : "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                padding: "0 24px",
+                padding: "0 10px",
               }}
             >
-              <FiHeart size={24} />
-              <FiShoppingCart size={24} />
+              <Badge count={5} style={{fontSize: 12}}>
+                <Button type="text" size="large" icon={<FiHeart size={26} />} />
+              </Badge>
+              <Badge count={5} style={{fontSize: 12}}>
+                <Button
+                  type="text"
+                  size="large"
+                  icon={<FiShoppingCart size={26} />}
+                />
+              </Badge>
             </Col>
             <Col
               span={lg ? 11 : 24}
@@ -287,13 +298,16 @@ const HeaderCustom = () => {
           ]}
         />
         <Divider />
-        <Typography.Title level={5}>Shop</Typography.Title>
+        <Typography.Title level={5} style={{marginBottom: 20}}>
+          Shop
+        </Typography.Title>
         <Tree
           showLine
           switcherIcon={<FaCaretRight size={18} />}
           defaultExpandedKeys={["0-0-0"]}
           onSelect={(value) => {
-            router.push(`/categories/${value}`);
+            router.push(`/shop?category=${value}`);
+            setCheck(!check);
           }}
           treeData={categoriesCustom}
           style={{height: "100%"}}

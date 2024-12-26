@@ -5,6 +5,7 @@ export type CategoryType = {
   parentId: string;
   active: boolean;
   createdAt: string;
+  thumbnail: string;
 };
 
 export type CreateCategoryType = {

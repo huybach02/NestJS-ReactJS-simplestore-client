@@ -19,6 +19,7 @@ export type ProductType = {
   saleStartDate: Moment | null;
   saleEndDate: Moment | null;
   quantity: number;
+  soldQuantity: number;
   superCategory: {
     _id: string;
     name: string;
@@ -30,6 +31,7 @@ export type ProductType = {
   takingReturn: string | null;
   thumbnail: string | null;
   photoUrls: string[];
+  shortDescription: string | null;
   description: string;
   images: string[];
   variants: ProductVariantType[];

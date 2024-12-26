@@ -1,7 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {DataNode} from "antd/es/tree";
 
-export const handleTreeValueCustom = (data: any[], key: string) => {
+export const handleTreeValueCustom = (
+  data: any[],
+  key: string,
+  isUseId: boolean = false
+) => {
   const buildTree = (parentId: string | null = null): any[] => {
     return data
       .filter((item) =>
@@ -10,7 +14,7 @@ export const handleTreeValueCustom = (data: any[], key: string) => {
       .map((item) => {
         const children = buildTree(item._id);
         const node = {
-          key: item._id,
+          key: isUseId ? item._id : item.slug,
           title: item.name,
           value: item._id,
           ...item,

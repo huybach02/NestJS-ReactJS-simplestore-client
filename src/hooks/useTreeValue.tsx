@@ -3,7 +3,11 @@
 import Link from "next/link";
 
 const useTreeValue = () => {
-  const handleTreeValue = (data: any[], key: string = "parentId") => {
+  const handleTreeValue = (
+    data: any[],
+    key: string = "parentId",
+    isUseId: boolean = false
+  ) => {
     const buildTree = (parentId: string | null = null): any[] => {
       return data
         .filter((item) =>
@@ -12,8 +16,12 @@ const useTreeValue = () => {
         .map((item) => {
           const children = buildTree(item._id);
           const node = {
-            key: item._id,
-            label: <Link href={`/categories/${item._id}`}>{item.name}</Link>,
+            key: isUseId ? item._id : item.slug,
+            label: (
+              <Link href={`/shop?category=${isUseId ? item._id : item.slug}`}>
+                {item.name}
+              </Link>
+            ),
           };
 
           if (children.length > 0) {

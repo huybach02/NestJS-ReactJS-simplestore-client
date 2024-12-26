@@ -7,6 +7,7 @@ import {setUser} from "@/redux/slice/userSlice";
 import {authService} from "@/service/authService";
 import {usePathname} from "next/navigation";
 import HeaderCustom from "@/components/HeaderCustom";
+import FooterMain from "@/components/FooterMain";
 
 type RouterProps = {
   Component: AppProps["Component"];
@@ -52,7 +53,9 @@ const Routers = ({Component, pageProps}: RouterProps) => {
       <Layout.Content style={{backgroundColor: "#fff"}}>
         <Component {...pageProps} />
       </Layout.Content>
-      <Layout.Footer style={{backgroundColor: "#fff"}}>Footer</Layout.Footer>
+      <Layout.Footer style={{backgroundColor: "#fff"}}>
+        <FooterMain />
+      </Layout.Footer>
     </Layout>
   );
 };

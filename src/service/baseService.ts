@@ -28,6 +28,10 @@ export const baseService = {
     }
   },
 
+  findOne: async (endpoint: string, slug: string) => {
+    return await axiosInstance.get(`${endpoint}/${slug}`);
+  },
+
   findAllVariants: async (endpoint: string, productId: string) => {
     return await axiosInstance.get(`${endpoint}?productId=${productId}`);
   },
