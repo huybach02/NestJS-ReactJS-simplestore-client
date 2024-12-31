@@ -1,12 +1,16 @@
 import ContainerMain from "@/components/ContainerMain";
 import SectionMain from "@/components/SectionMain";
+import useCart from "@/hooks/useCart";
+import usePrice from "@/hooks/usePrice";
 import {baseService} from "@/service/baseService";
 import {ProductType} from "@/types/productType";
+import {ProductVariantType} from "@/types/productVariantType";
 import {
   checkHasSale,
   checkProductHasVariantSale,
   countVariantSale,
 } from "@/utils/checkHasSale";
+import {debounce} from "@/utils/debounce";
 import {formatMoney} from "@/utils/formatMoney";
 import {
   Badge,
@@ -19,6 +23,7 @@ import {
   Typography,
   Statistic,
   Button,
+  InputNumber,
 } from "antd";
 import Head from "next/head";
 import Link from "next/link";
@@ -67,6 +72,8 @@ export async function getStaticProps({params}: {params: {slug: string}}) {
 const ProductPage = ({product}: {product: ProductType}) => {
   const {lg} = Grid.useBreakpoint();
 
+  const {handleAddToCart} = useCart();
+
   const settings = {
     dots: lg ? true : false,
     infinite: true,
@@ -97,21 +104,17 @@ const ProductPage = ({product}: {product: ProductType}) => {
     ...product.images,
   ]);
   const [currentImage, setCurrentImage] = useState(product.thumbnail as string);
-  const [price, setPrice] = useState<{
-    originalPrice: number;
-    salePrice?: number | null;
-  }>({
-    originalPrice: 0,
-    salePrice: null,
-  });
-  const [selectedVariant, setSelectedVariant] = useState(
-    product.hasVariant ? product.variants[0] : null
-  );
+  const [selectedVariant, setSelectedVariant] =
+    useState<ProductVariantType | null>(
+      product.hasVariant ? product.variants[0] : null
+    );
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [sizes, setSizes] = useState<string[]>(
     product.hasVariant ? product.variants[0].sizes : []
   );
   const [quantity, setQuantity] = useState(1);
+
+  const {getPrice} = usePrice();
 
   useEffect(() => {
     if (product.hasVariant) {
@@ -122,24 +125,6 @@ const ProductPage = ({product}: {product: ProductType}) => {
       if (variantThumbnails.length > 0) {
         setImages((prev) => [...prev, ...variantThumbnails]);
       }
-    }
-
-    if (!product.hasVariant) {
-      const newPrice = {
-        originalPrice: product.originalPrice,
-        salePrice:
-          product.hasSale && checkHasSale(product) ? product.salePrice : null,
-      };
-      setPrice(newPrice);
-    } else {
-      const newPrice = {
-        originalPrice: selectedVariant?.originalPrice ?? 0,
-        salePrice:
-          selectedVariant?.hasSale && checkHasSale(selectedVariant)
-            ? selectedVariant.salePrice
-            : null,
-      };
-      setPrice(newPrice);
     }
 
     if (selectedVariant) {
@@ -217,7 +202,7 @@ const ProductPage = ({product}: {product: ProductType}) => {
                       <Badge
                         count={
                           countVariantSale(product) > 0
-                            ? `${countVariantSale(product)} variants on sale`
+                            ? `${countVariantSale(product)} version(s) on sale`
                             : "Sale"
                         }
                         color={"red"}
@@ -266,25 +251,32 @@ const ProductPage = ({product}: {product: ProductType}) => {
                 </Flex>
                 <Flex vertical={!lg} justify="space-between" gap={10}>
                   <Flex gap={20}>
-                    {price.salePrice && (
+                    {getPrice(product, selectedVariant).salePrice && (
                       <Typography.Paragraph
                         style={{
                           fontSize: lg ? 36 : 28,
                           fontWeight: 700,
                         }}
                       >
-                        {formatMoney(price.salePrice)}
+                        {formatMoney(
+                          getPrice(product, selectedVariant).salePrice ?? 0
+                        )}
                       </Typography.Paragraph>
                     )}
                     <Typography.Paragraph
                       style={{
-                        textDecoration: price.salePrice ? "line-through" : "",
+                        textDecoration: getPrice(product, selectedVariant)
+                          .salePrice
+                          ? "line-through"
+                          : "",
                         fontSize: lg ? 30 : 26,
                         fontWeight: "normal",
                         marginTop: lg ? 4 : 0,
                       }}
                     >
-                      {formatMoney(price.originalPrice)}
+                      {formatMoney(
+                        getPrice(product, selectedVariant).originalPrice
+                      )}
                     </Typography.Paragraph>
                   </Flex>
                   {(product.hasSale && checkHasSale(product)) ||
@@ -297,9 +289,11 @@ const ProductPage = ({product}: {product: ProductType}) => {
                     >
                       <Statistic.Countdown
                         title="Sale end in:"
-                        value={
-                          product.saleEndDate || selectedVariant?.saleEndDate
-                        }
+                        value={new Date(
+                          product.saleEndDate ||
+                            selectedVariant?.saleEndDate ||
+                            Date.now()
+                        ).getTime()}
                         format="D[d] H[h] m[m] s[s]"
                         className="custom-countdown"
                       />
@@ -316,7 +310,7 @@ const ProductPage = ({product}: {product: ProductType}) => {
                   <Flex vertical gap={30} style={{marginTop: 40}}>
                     <Flex vertical gap={10}>
                       <Typography.Text style={{fontSize: 18, fontWeight: 500}}>
-                        Select Version
+                        Select Version ({selectedVariant?.quantity} left)
                       </Typography.Text>
                       <Flex gap={10} wrap>
                         {product.variants.map((variant) => (
@@ -382,17 +376,26 @@ const ProductPage = ({product}: {product: ProductType}) => {
                     >
                       -
                     </Button>
-                    <Typography.Text
-                      style={{
-                        fontSize: 18,
-                        fontWeight: 500,
-                        padding: "5px 40px",
-                        border: "1px solid #ccc",
-                        borderRadius: 5,
+                    <InputNumber
+                      value={quantity}
+                      onChange={(value) => {
+                        if (value) {
+                          const debouncedUpdate = debounce(
+                            () => setQuantity(value),
+                            500
+                          );
+                          debouncedUpdate();
+                        }
                       }}
-                    >
-                      {quantity}
-                    </Typography.Text>
+                      min={1}
+                      max={
+                        product.hasVariant
+                          ? selectedVariant?.quantity
+                          : product.quantity
+                      }
+                      style={{width: 80}}
+                      controls={false}
+                    />
                     <Button
                       onClick={() => {
                         if (
@@ -420,6 +423,14 @@ const ProductPage = ({product}: {product: ProductType}) => {
                     size={"large"}
                     style={{width: "300px"}}
                     icon={<BsCartPlus />}
+                    onClick={() =>
+                      handleAddToCart(
+                        product,
+                        selectedVariant,
+                        selectedSize,
+                        quantity
+                      )
+                    }
                   >
                     Add to cart
                   </Button>

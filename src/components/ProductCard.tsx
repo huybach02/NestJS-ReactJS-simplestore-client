@@ -4,16 +4,17 @@ import {handleShowPrice} from "@/utils/handleShowPrice";
 import {limitText} from "@/utils/limitText";
 import {Badge, Button, Card, Flex, Grid, Image, Typography} from "antd";
 import Link from "next/link";
+import {useRouter} from "next/router";
 import React from "react";
-import {BsCartPlus} from "react-icons/bs";
 import {FiHeart} from "react-icons/fi";
 import {IoStar} from "react-icons/io5";
-import {MdOutlineRemoveRedEye} from "react-icons/md";
 
 const {Text} = Typography;
 
 const ProductCard = ({product}: {product: ProductType}) => {
   const {lg} = Grid.useBreakpoint();
+
+  const router = useRouter();
 
   const {originalPrice, salePrice, minPrice, maxPrice} =
     handleShowPrice(product);
@@ -31,7 +32,7 @@ const ProductCard = ({product}: {product: ProductType}) => {
               : "none",
         }}
       >
-        <Card hoverable style={{height: lg ? 440 : 420, position: "relative"}}>
+        <Card hoverable style={{height: lg ? 440 : 390, position: "relative"}}>
           <div style={{width: "100%"}}>
             <Link href={`/product/${product.slug}`}>
               <Image
@@ -46,18 +47,6 @@ const ProductCard = ({product}: {product: ProductType}) => {
                 }}
               />
             </Link>
-            <div className="">
-              <div className="product-actions">
-                <Button type="default" shape="circle" icon={<FiHeart />} />
-                <Link href={`/product/${product.slug}`}>
-                  <Button
-                    type="default"
-                    shape="circle"
-                    icon={<MdOutlineRemoveRedEye />}
-                  />
-                </Link>
-              </div>
-            </div>
           </div>
 
           <div style={{marginTop: 15}}>
@@ -159,15 +148,30 @@ const ProductCard = ({product}: {product: ProductType}) => {
                 </>
               )}
               {product.hasVariant && product.variants.length > 1 && (
-                <>
-                  <Text style={{fontSize: lg ? 16 : 14}}>{minPrice}</Text>
-                  {maxPrice && (
-                    <>
-                      <Text>-</Text>
-                      <Text style={{fontSize: lg ? 16 : 14}}>{maxPrice}</Text>
-                    </>
-                  )}
-                </>
+                <Flex wrap gap={5}>
+                  <Flex align="center" gap={5}>
+                    <Text
+                      style={{
+                        fontSize: lg ? 16 : 12,
+                        fontWeight: 400,
+                        display: !lg ? "block" : "none",
+                      }}
+                    >
+                      From
+                    </Text>
+                    <Text style={{fontSize: lg ? 16 : 14}}>{minPrice}</Text>
+                  </Flex>
+                  <Flex align="center" gap={5}>
+                    {maxPrice && (
+                      <>
+                        <Text style={{fontSize: lg ? 16 : 12, fontWeight: 400}}>
+                          {lg ? "-" : "To"}
+                        </Text>
+                        <Text style={{fontSize: lg ? 16 : 14}}>{maxPrice}</Text>
+                      </>
+                    )}
+                  </Flex>
+                </Flex>
               )}
             </Flex>
           </div>
@@ -179,20 +183,23 @@ const ProductCard = ({product}: {product: ProductType}) => {
               bottom: 20,
               left: 0,
               right: 0,
+              display: lg ? "flex" : "none",
             }}
+            gap={10}
           >
             <Button
               size={lg ? "middle" : "small"}
               type="default"
               style={{
                 fontSize: lg ? 16 : 14,
-                padding: lg ? "10px 20px" : "14px 20px",
+                padding: "10px 20px",
                 boxShadow: "0 0 10px rgba(0, 0, 0, 0.2)",
               }}
-              icon={<BsCartPlus />}
+              onClick={() => router.push(`/product/${product.slug}`)}
             >
-              Add to Cart
+              View Details
             </Button>
+            <Button type="default" shape="circle" icon={<FiHeart />} />
           </Flex>
         </Card>
       </Badge.Ribbon>

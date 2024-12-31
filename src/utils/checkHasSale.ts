@@ -3,9 +3,9 @@ import {ProductVariantType} from "@/types/productVariantType";
 
 export const checkHasSale = (item: ProductType | ProductVariantType) => {
   const now = new Date();
-  const startDate = new Date(item.saleStartDate);
-  const endDate = new Date(item.saleEndDate);
-  return now >= startDate && now <= endDate;
+  const startDate = item.saleStartDate ? new Date(item.saleStartDate) : null;
+  const endDate = item.saleEndDate ? new Date(item.saleEndDate) : null;
+  return startDate && endDate && now >= startDate && now <= endDate;
 };
 
 export const checkProductHasVariantSale = (product: ProductType) => {

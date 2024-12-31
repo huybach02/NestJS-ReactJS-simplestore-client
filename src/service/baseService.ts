@@ -24,7 +24,7 @@ export const baseService = {
       }
     } catch (error: any) {
       message.error(error.response.data.message);
-      return Promise.reject(error);
+      // return Promise.reject(error);
     }
   },
 

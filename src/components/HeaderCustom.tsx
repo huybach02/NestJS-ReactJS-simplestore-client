@@ -1,5 +1,9 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import useCart from "@/hooks/useCart";
 import useTreeValue from "@/hooks/useTreeValue";
+import {clearCart} from "@/redux/slice/cartSlice";
+import {setShowMiniCart} from "@/redux/slice/dataSlice";
 import {removeUser} from "@/redux/slice/userSlice";
 import {RootState} from "@/redux/store";
 import {authService} from "@/service/authService";
@@ -39,6 +43,7 @@ const HeaderCustom = () => {
   const dispatch = useDispatch();
 
   const {handleTreeValue} = useTreeValue();
+  const {cart} = useCart();
 
   const {lg} = Grid.useBreakpoint();
 
@@ -99,6 +104,7 @@ const HeaderCustom = () => {
       onClick: async () => {
         await authService.logout();
         dispatch(removeUser());
+        dispatch(clearCart());
         router.push("/");
       },
     },
@@ -214,11 +220,19 @@ const HeaderCustom = () => {
               <Badge count={5} style={{fontSize: 12}}>
                 <Button type="text" size="large" icon={<FiHeart size={26} />} />
               </Badge>
-              <Badge count={5} style={{fontSize: 12}}>
+              <Badge
+                count={cart.length > 0 ? cart?.length : 0}
+                style={{fontSize: 12}}
+              >
                 <Button
                   type="text"
                   size="large"
                   icon={<FiShoppingCart size={26} />}
+                  onClick={() => {
+                    if (!router.pathname.includes("/cart")) {
+                      dispatch(setShowMiniCart());
+                    }
+                  }}
                 />
               </Badge>
             </Col>
@@ -269,7 +283,7 @@ const HeaderCustom = () => {
         <Col span={lg ? 1 : 0}></Col>
       </Row>
       <Drawer
-        title=""
+        title={`Hello, ${user?.name}`}
         placement={"left"}
         onClose={() => setOpen(false)}
         open={open}
@@ -277,6 +291,64 @@ const HeaderCustom = () => {
         closeIcon={<IoClose size={30} />}
         width={!lg ? "100%" : 0}
       >
+        <Flex
+          justify="center"
+          align="center"
+          gap={40}
+          style={{marginBottom: 20}}
+        >
+          <div>
+            {user ? (
+              <Dropdown menu={{items}} trigger={["click"]}>
+                <a onClick={(e) => e.preventDefault()}>
+                  <Space>
+                    <Avatar
+                      src={
+                        user?.avatar ||
+                        "https://static-00.iconduck.com/assets.00/avatar-default-symbolic-icon-512x512-0mhn1054.png"
+                      }
+                      size={"large"}
+                    />
+                  </Space>
+                </a>
+              </Dropdown>
+            ) : (
+              <Flex gap={10}>
+                <Link href={"/auth/login"}>
+                  <Button
+                    type="primary"
+                    size="large"
+                    style={{fontSize: 12, padding: `0 ${lg ? 26 : 16}px`}}
+                  >
+                    Login
+                  </Button>
+                </Link>
+              </Flex>
+            )}
+          </div>
+          <Flex justify="end" align="center" gap={40}>
+            <Badge count={5} style={{fontSize: 12}}>
+              <Button type="text" size="large" icon={<FiHeart size={26} />} />
+            </Badge>
+            <Badge
+              count={cart.length > 0 ? cart?.length : 0}
+              style={{fontSize: 12}}
+            >
+              <Button
+                type="text"
+                size="large"
+                icon={<FiShoppingCart size={26} />}
+              />
+            </Badge>
+          </Flex>
+        </Flex>
+        <Flex justify="center" align="center" style={{marginBottom: 30}}>
+          <Input.Search
+            placeholder="Search..."
+            width={50}
+            style={{display: "flex", alignItems: "center"}}
+          />
+        </Flex>
         <Menu
           items={[
             {

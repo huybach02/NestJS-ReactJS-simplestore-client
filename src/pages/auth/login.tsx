@@ -40,8 +40,12 @@ const Login = () => {
         remember: isRemember,
       });
       if (response?.success) {
+        if (router.query.product) {
+          router.back();
+        } else {
+          router.push("/");
+        }
         dispatch(setUser(response?.data));
-        router.push("/");
       } else {
         router.push("/auth/verified?email=" + response?.data?.email);
       }

@@ -1,4 +1,5 @@
-import {useDispatch} from "react-redux";
+/* eslint-disable react-hooks/exhaustive-deps */
+import {useDispatch, useSelector} from "react-redux";
 import {useEffect, useState} from "react";
 import {AppProps} from "next/app";
 import Loading from "@/components/Loading";
@@ -8,6 +9,9 @@ import {authService} from "@/service/authService";
 import {usePathname} from "next/navigation";
 import HeaderCustom from "@/components/HeaderCustom";
 import FooterMain from "@/components/FooterMain";
+import useCart from "@/hooks/useCart";
+import {RootState} from "@/redux/store";
+import MiniCart from "@/components/MiniCart";
 
 type RouterProps = {
   Component: AppProps["Component"];
@@ -16,13 +20,17 @@ type RouterProps = {
 
 const Routers = ({Component, pageProps}: RouterProps) => {
   const dispatch = useDispatch();
+  const {user} = useSelector((state: RootState) => state.user);
 
   const pathname = usePathname();
 
   const [isLoading, setIsLoading] = useState(true);
 
+  const {getCart} = useCart();
+
   const getMe = async () => {
     const user = await authService.me();
+
     if (user && "success" in user) {
       dispatch(setUser(user.data));
     }
@@ -36,6 +44,12 @@ const Routers = ({Component, pageProps}: RouterProps) => {
 
     return () => clearTimeout(timeout);
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      getCart();
+    }
+  }, [user]);
 
   return isLoading ? (
     <Loading />
@@ -56,6 +70,7 @@ const Routers = ({Component, pageProps}: RouterProps) => {
       <Layout.Footer style={{backgroundColor: "#fff"}}>
         <FooterMain />
       </Layout.Footer>
+      <MiniCart />
     </Layout>
   );
 };

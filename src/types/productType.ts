@@ -16,8 +16,8 @@ export type ProductType = {
   typeSale: string | null;
   saleValue: number | null;
   salePrice: number | null;
-  saleStartDate: Moment | null;
-  saleEndDate: Moment | null;
+  saleStartDate: Date | null;
+  saleEndDate: Date | null;
   quantity: number;
   soldQuantity: number;
   superCategory: {
