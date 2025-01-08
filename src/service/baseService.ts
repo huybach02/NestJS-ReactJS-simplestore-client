@@ -52,9 +52,13 @@ export const baseService = {
   },
 
   addToWishlist: async (productId: string) => {
-    return await axiosInstance.post(`wishlists`, {
-      productId,
-    });
+    try {
+      return await axiosInstance.post(`wishlists`, {
+        productId,
+      });
+    } catch (error: any) {
+      message.error(error.response.data.message);
+    }
   },
 
   getWishlist: async () => {
@@ -62,7 +66,11 @@ export const baseService = {
   },
 
   removeFromWishlist: async (productId: string) => {
-    return await axiosInstance.delete(`wishlists/${productId}`);
+    try {
+      return await axiosInstance.delete(`wishlists/${productId}`);
+    } catch (error: any) {
+      message.error(error.response.data.message);
+    }
   },
 
   getAllManageWebsite: async () => {
