@@ -143,13 +143,19 @@ const Login = () => {
               size="large"
               disabled={isLoading}
             >
-              <Form.Item label="Email" name="email" rules={[{required: true}]}>
+              <Form.Item
+                label="Email"
+                name="email"
+                rules={[{required: true}]}
+                initialValue={"huybach2002ct@gmail.com"}
+              >
                 <Input placeholder="example@gmail.com" />
               </Form.Item>
               <Form.Item
                 label="Password"
                 name="password"
                 rules={[{required: true}]}
+                initialValue={"password"}
               >
                 <Input.Password placeholder="********" />
               </Form.Item>

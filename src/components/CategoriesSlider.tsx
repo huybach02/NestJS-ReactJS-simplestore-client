@@ -59,7 +59,7 @@ const CategoriesSlider = ({categories}: {categories: CategoryType[]}) => {
                     }}
                   />
                   <Link
-                    href={`/shop?category=${category.slug}`}
+                    href={`/shop?categories=${category.slug}`}
                     style={{width: "95%", margin: "auto"}}
                   >
                     <Button

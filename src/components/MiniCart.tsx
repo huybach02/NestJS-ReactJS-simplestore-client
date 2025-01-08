@@ -15,6 +15,7 @@ const MiniCart = () => {
   const router = useRouter();
 
   const {showMiniCart} = useSelector((state: RootState) => state.data);
+  const {user} = useSelector((state: RootState) => state.user);
   const {cart, handleRemoveFromCart} = useCart();
 
   const {getPrice} = usePrice();
@@ -146,7 +147,7 @@ const MiniCart = () => {
         >
           Cancel
         </Button>
-        <Link href="/cart">
+        <Link href={user ? "/cart" : "/auth/login"}>
           <Button type="primary" size="middle">
             Go to Cart
           </Button>

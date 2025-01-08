@@ -71,7 +71,7 @@ const findCategoryPath = (
 };
 
 export const createTreeCategoryByCurrentId = (
-  categories: TreeNode[],
+  categories: any[],
   currentId: string
 ): DataNode[] => {
   const pathCategories = findCategoryPath(categories, currentId);
@@ -96,4 +96,103 @@ export const createTreeCategoryByCurrentId = (
   }
 
   return [result];
+};
+
+export const getMultipleChildrenCategories = (
+  categories: any[],
+  categoryIds: string[]
+): string[] => {
+  const result: string[] = [];
+  const resultSlug: string[] = [];
+
+  categoryIds.forEach((categoryId) => {
+    getChildrenCategory(categories, categoryId, result);
+  });
+
+  result.forEach((element) => {
+    for (const item of categories) {
+      if (item._id === element) {
+        resultSlug.push(item.slug);
+      }
+    }
+  });
+
+  return resultSlug;
+};
+
+export const getChildrenCategory = (
+  categories: any[],
+  currentId: string,
+  data: string[] = []
+): string[] => {
+  if (!data.includes(currentId)) {
+    data.push(currentId);
+  }
+
+  const childCategories = categories.filter(
+    (category) => category.parentId === currentId
+  );
+
+  childCategories.forEach((child) => {
+    getChildrenCategory(categories, child._id, data);
+  });
+
+  return data;
+};
+
+export const getChildrenCategorySlug = (
+  categories: any[],
+  currentSlug: string,
+  data: string[] = []
+): string[] => {
+  const currentId = categories.find(
+    (category) => category.slug === currentSlug
+  )?._id;
+
+  if (!data.includes(currentId)) {
+    data.push(currentId);
+  }
+
+  const childCategories = categories.filter(
+    (category) => category.parentId === currentId
+  );
+
+  childCategories.forEach((child) => {
+    getChildrenCategorySlug(categories, child.slug, data);
+  });
+
+  return data;
+};
+
+export const getCategoryIdBySlug = (
+  categories: any[],
+  slug: string
+): string | null => {
+  for (const category of categories) {
+    if (category.slug === slug) {
+      return category._id;
+    }
+
+    if (category.children) {
+      const result = getCategoryIdBySlug(category.children, slug);
+      if (result) {
+        return result;
+      }
+    }
+  }
+  return null;
+};
+
+export const getParentKeys = (key: string, tree: any[]): string[] => {
+  const parentKeys: string[] = [];
+  const findParent = (nodes: any[]) => {
+    for (const node of nodes) {
+      if (node.children?.some((child: any) => child.slug === key)) {
+        parentKeys.push(node._id);
+        findParent(node.children);
+      }
+    }
+  };
+  findParent(tree);
+  return parentKeys;
 };

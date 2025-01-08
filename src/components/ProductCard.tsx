@@ -1,3 +1,5 @@
+import {reloadWishlist} from "@/redux/slice/dataSlice";
+import {baseService} from "@/service/baseService";
 import {ProductType} from "@/types/productType";
 import {checkHasSale, checkProductHasVariantSale} from "@/utils/checkHasSale";
 import {handleShowPrice} from "@/utils/handleShowPrice";
@@ -6,18 +8,38 @@ import {Badge, Button, Card, Flex, Grid, Image, Typography} from "antd";
 import Link from "next/link";
 import {useRouter} from "next/router";
 import React from "react";
-import {FiHeart} from "react-icons/fi";
+import {FiHeart, FiTrash2} from "react-icons/fi";
 import {IoStar} from "react-icons/io5";
+import {useDispatch} from "react-redux";
+import {AppDispatch} from "@/redux/store";
 
 const {Text} = Typography;
 
-const ProductCard = ({product}: {product: ProductType}) => {
+const ProductCard = ({
+  product,
+  isInWishlist = false,
+}: {
+  product: ProductType;
+  isInWishlist?: boolean;
+}) => {
+  const dispatch = useDispatch<AppDispatch>();
+
   const {lg} = Grid.useBreakpoint();
 
   const router = useRouter();
 
   const {originalPrice, salePrice, minPrice, maxPrice} =
     handleShowPrice(product);
+
+  const handleAddToWishlist = async (productId: string) => {
+    await baseService.addToWishlist(productId);
+    dispatch(reloadWishlist());
+  };
+
+  const handleRemoveFromWishlist = async (productId: string) => {
+    await baseService.removeFromWishlist(productId);
+    dispatch(reloadWishlist());
+  };
 
   return (
     <>
@@ -34,7 +56,10 @@ const ProductCard = ({product}: {product: ProductType}) => {
       >
         <Card hoverable style={{height: lg ? 440 : 390, position: "relative"}}>
           <div style={{width: "100%"}}>
-            <Link href={`/product/${product.slug}`}>
+            <Link
+              href={`/product/${product.slug}`}
+              style={{width: "100%", display: "flex", justifyContent: "center"}}
+            >
               <Image
                 src={product.thumbnail || ""}
                 alt={product.name}
@@ -199,7 +224,22 @@ const ProductCard = ({product}: {product: ProductType}) => {
             >
               View Details
             </Button>
-            <Button type="default" shape="circle" icon={<FiHeart />} />
+            {!isInWishlist ? (
+              <Button
+                type="default"
+                shape="circle"
+                icon={<FiHeart />}
+                onClick={() => handleAddToWishlist(product._id)}
+              />
+            ) : (
+              <Button
+                type="default"
+                danger
+                shape="circle"
+                icon={<FiTrash2 />}
+                onClick={() => handleRemoveFromWishlist(product._id)}
+              />
+            )}
           </Flex>
         </Card>
       </Badge.Ribbon>

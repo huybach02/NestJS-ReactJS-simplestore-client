@@ -1,0 +1,72 @@
+[
+  {
+    "name": "Michael Wilson",
+    "position": "Bank Director",
+    "comment": "Great quality products and excellent customer service! Highly recommended.",
+    "rating": 5,
+    "photoUrl": "https://randomuser.me/api/portraits/men/32.jpg"
+  },
+  {
+    "name": "James Anderson",
+    "position": "Senior Attorney",
+    "comment": "Very satisfied with my purchases. Will definitely shop here again!",
+    "rating": 5,
+    "photoUrl": "https://randomuser.me/api/portraits/men/45.jpg"
+  },
+  {
+    "name": "Robert Smith",
+    "position": "CEO",
+    "comment": "Fast shipping and great communication. Love the quality!",
+    "rating": 4,
+    "photoUrl": "https://randomuser.me/api/portraits/men/22.jpg"
+  },
+  {
+    "name": "William Brown",
+    "position": "Architect",
+    "comment": "Amazing shopping experience. The quality exceeded my expectations.",
+    "rating": 5,
+    "photoUrl": "https://randomuser.me/api/portraits/men/18.jpg"
+  },
+  {
+    "name": "David Taylor",
+    "position": "Fund Manager",
+    "comment": "Outstanding service and premium quality products. Thank you!",
+    "rating": 5,
+    "photoUrl": "https://randomuser.me/api/portraits/men/55.jpg"
+  },
+  {
+    "name": "John Martinez",
+    "position": "Surgeon",
+    "comment": "Great value for money. Will be a returning customer for sure.",
+    "rating": 4,
+    "photoUrl": "https://randomuser.me/api/portraits/men/67.jpg"
+  },
+  {
+    "name": "Thomas Johnson",
+    "position": "Film Director",
+    "comment": "Excellent quality and fantastic customer support. Highly satisfied!",
+    "rating": 5,
+    "photoUrl": "https://randomuser.me/api/portraits/men/28.jpg"
+  },
+  {
+    "name": "Richard Davis",
+    "position": "Executive Chef",
+    "comment": "Perfect fit and great quality. Would definitely recommend!",
+    "rating": 5,
+    "photoUrl": "https://randomuser.me/api/portraits/men/91.jpg"
+  },
+  {
+    "name": "Charles Miller",
+    "position": "Hotel Manager",
+    "comment": "Very impressed with the quality and service. Will shop again!",
+    "rating": 4,
+    "photoUrl": "https://randomuser.me/api/portraits/men/36.jpg"
+  },
+  {
+    "name": "Daniel Wilson",
+    "position": "Tech Director",
+    "comment": "Exceptional service and premium quality. Absolutely satisfied!",
+    "rating": 5,
+    "photoUrl": "https://randomuser.me/api/portraits/men/83.jpg"
+  }
+]

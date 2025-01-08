@@ -46,4 +46,26 @@ export const baseService = {
       value: category._id,
     }));
   },
+
+  getRelatedProduct: async (categoryId: string) => {
+    return await axiosInstance.get(`products/related/${categoryId}`);
+  },
+
+  addToWishlist: async (productId: string) => {
+    return await axiosInstance.post(`wishlists`, {
+      productId,
+    });
+  },
+
+  getWishlist: async () => {
+    return await axiosInstance.get(`wishlists`);
+  },
+
+  removeFromWishlist: async (productId: string) => {
+    return await axiosInstance.delete(`wishlists/${productId}`);
+  },
+
+  getAllManageWebsite: async () => {
+    return await axiosInstance.get(`manage-website/all`);
+  },
 };

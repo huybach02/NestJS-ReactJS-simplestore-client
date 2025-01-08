@@ -1,7 +1,11 @@
 import ContainerMain from "@/components/ContainerMain";
+import DetailOfProduct from "@/components/DetailOfProduct";
+import RelatedProduct from "@/components/RelatedProduct";
 import SectionMain from "@/components/SectionMain";
 import useCart from "@/hooks/useCart";
 import usePrice from "@/hooks/usePrice";
+import {reloadWishlist} from "@/redux/slice/dataSlice";
+import {AppDispatch} from "@/redux/store";
 import {baseService} from "@/service/baseService";
 import {ProductType} from "@/types/productType";
 import {ProductVariantType} from "@/types/productVariantType";
@@ -31,6 +35,7 @@ import React, {useEffect, useState} from "react";
 import {BsCartPlus} from "react-icons/bs";
 import {FiHeart} from "react-icons/fi";
 import {IoStar} from "react-icons/io5";
+import {useDispatch} from "react-redux";
 import Slider from "react-slick";
 
 export async function getStaticPaths() {
@@ -38,7 +43,7 @@ export async function getStaticPaths() {
     active: true,
   });
   return {
-    paths: products.data.map((product: ProductType) => ({
+    paths: products?.data.map((product: ProductType) => ({
       params: {slug: product.slug},
     })),
     fallback: false,
@@ -70,6 +75,8 @@ export async function getStaticProps({params}: {params: {slug: string}}) {
 }
 
 const ProductPage = ({product}: {product: ProductType}) => {
+  const dispatch = useDispatch<AppDispatch>();
+
   const {lg} = Grid.useBreakpoint();
 
   const {handleAddToCart} = useCart();
@@ -116,6 +123,11 @@ const ProductPage = ({product}: {product: ProductType}) => {
 
   const {getPrice} = usePrice();
 
+  const handleAddToWishlist = async (productId: string) => {
+    await baseService.addToWishlist(productId);
+    dispatch(reloadWishlist());
+  };
+
   useEffect(() => {
     if (product.hasVariant) {
       const variantThumbnails = product.variants
@@ -140,6 +152,17 @@ const ProductPage = ({product}: {product: ProductType}) => {
       }
     }
   }, [product, selectedVariant, images]);
+
+  useEffect(() => {
+    setCurrentImage(product.thumbnail as string);
+    setImages([
+      ...(product.thumbnail ? [product.thumbnail] : []),
+      ...product.images,
+    ]);
+    setSelectedVariant(product.hasVariant ? product.variants[0] : null);
+    setSelectedSize(null);
+    setQuantity(1);
+  }, [product]);
 
   return (
     <>
@@ -431,14 +454,38 @@ const ProductPage = ({product}: {product: ProductType}) => {
                         quantity
                       )
                     }
+                    disabled={
+                      !product.hasVariant
+                        ? product.quantity === 0
+                        : selectedVariant?.quantity === 0
+                    }
                   >
                     Add to cart
                   </Button>
-                  <Button type="default" size={"large"}>
+                  <Button
+                    type="default"
+                    size={"large"}
+                    onClick={() => handleAddToWishlist(product._id)}
+                  >
                     <FiHeart />
                   </Button>
                 </Flex>
               </Col>
+            </Row>
+
+            <Row style={{marginTop: lg ? 100 : 50, width: "100%"}}>
+              <DetailOfProduct
+                description={product.description}
+                productId={product._id}
+                slug={product.slug}
+              />
+            </Row>
+
+            <Row style={{marginTop: 50}}>
+              <RelatedProduct
+                categoryId={product.category?._id}
+                productId={product._id}
+              />
             </Row>
           </SectionMain>
         </ContainerMain>

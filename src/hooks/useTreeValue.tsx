@@ -18,9 +18,7 @@ const useTreeValue = () => {
           const node = {
             key: isUseId ? item._id : item.slug,
             label: (
-              <Link href={`/shop?category=${isUseId ? item._id : item.slug}`}>
-                {item.name}
-              </Link>
+              <Link href={`/shop?categories=${item.slug}`}>{item.name}</Link>
             ),
           };
 

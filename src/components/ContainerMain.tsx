@@ -6,7 +6,7 @@ const ContainerMain = ({children}: {children: React.ReactNode}) => {
 
   return (
     <>
-      <Col span={lg ? 2 : 2}></Col>
+      <Col span={lg ? 2 : 1}></Col>
       <Col span={lg ? 20 : 22}>{children}</Col>
       <Col span={lg ? 2 : 0}></Col>
     </>

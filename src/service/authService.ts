@@ -9,7 +9,6 @@ export const authService = {
       return await axiosInstance.post("/auth/register", data);
     } catch (error: any) {
       message.error(error.response.data.message);
-      return Promise.reject(error);
     }
   },
 
@@ -18,7 +17,6 @@ export const authService = {
       return await axiosInstance.post("/auth/login", data);
     } catch (error: any) {
       message.error(error.response.data.message);
-      return Promise.reject(error);
     }
   },
 
@@ -27,7 +25,6 @@ export const authService = {
       return await axiosInstance.post("/auth/social-login", data);
     } catch (error: any) {
       message.error(error.response.data.message);
-      return Promise.reject(error);
     }
   },
 
@@ -35,7 +32,7 @@ export const authService = {
     try {
       return await axiosInstance.get("/auth/logout");
     } catch (error: any) {
-      return Promise.reject(error);
+      message.error(error.response.data.message);
     }
   },
 
@@ -53,7 +50,6 @@ export const authService = {
       return await axiosInstance.post("/auth/verify-otp", data);
     } catch (error: any) {
       message.error(error.response.data.message);
-      return Promise.reject(error);
     }
   },
 
@@ -62,7 +58,6 @@ export const authService = {
       return await axiosInstance.post("/auth/forgot-password", data);
     } catch (error: any) {
       message.error(error.response.data.message);
-      return Promise.reject(error);
     }
   },
 
@@ -75,7 +70,26 @@ export const authService = {
       return await axiosInstance.post("/auth/reset-password", data);
     } catch (error: any) {
       message.error(error.response.data.message);
-      return Promise.reject(error);
+    }
+  },
+
+  updateProfile: async (data: {
+    name: string;
+    phone: string;
+    avatar: string | undefined;
+  }) => {
+    try {
+      return await axiosInstance.post("/auth/update-profile", data);
+    } catch (error: any) {
+      message.error(error.response.data.message);
+    }
+  },
+
+  changePassword: async (data: {oldPassword: string; newPassword: string}) => {
+    try {
+      return await axiosInstance.post("/auth/change-password", data);
+    } catch (error: any) {
+      message.error(error.response.data.message);
     }
   },
 };

@@ -87,7 +87,7 @@ axiosInstance.interceptors.response.use(
 
     if (error.response.status === 401 && !isRedirecting) {
       isRedirecting = true;
-      if (window.location.pathname !== "/") {
+      if (window.location.pathname.includes("/my-profile")) {
         window.location.href = "/";
       }
     }

@@ -179,7 +179,11 @@ const PlaceOrder = () => {
         router.push("/cart");
       }
     };
-    fetchCartTemp();
+
+    if (cartSelectedItems.length === 0 && subTotal === 0 && finalTotal === 0) {
+      fetchCartTemp();
+    }
+
     fetchAddress();
   }, []);
 

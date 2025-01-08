@@ -3,7 +3,7 @@
 import useCart from "@/hooks/useCart";
 import useTreeValue from "@/hooks/useTreeValue";
 import {clearCart} from "@/redux/slice/cartSlice";
-import {setShowMiniCart} from "@/redux/slice/dataSlice";
+import {clearWishlist, setShowMiniCart} from "@/redux/slice/dataSlice";
 import {removeUser} from "@/redux/slice/userSlice";
 import {RootState} from "@/redux/store";
 import {authService} from "@/service/authService";
@@ -48,6 +48,7 @@ const HeaderCustom = () => {
   const {lg} = Grid.useBreakpoint();
 
   const {user} = useSelector((state: RootState) => state.user);
+  const {wishlist} = useSelector((state: RootState) => state.data);
   const [categories, setCategories] = useState<any[]>([]);
   const [categoriesCustom, setCategoriesCustom] = useState<any[]>([]);
   const [currentPath, setCurrentPath] = useState<string>("home");
@@ -76,19 +77,33 @@ const HeaderCustom = () => {
     },
     {
       label: (
-        <Link href="/" rel="noopener noreferrer">
-          Profile
+        <Link
+          href="/my-profile?activeTab=personal-information"
+          rel="noopener noreferrer"
+        >
+          My Profile
         </Link>
       ),
       key: "2",
     },
     {
       label: (
-        <Link href="/" rel="noopener noreferrer">
-          Dashboard
+        <Link href="/my-profile?activeTab=my-orders" rel="noopener noreferrer">
+          My Orders
         </Link>
       ),
       key: "3",
+    },
+    {
+      label: (
+        <Link
+          href="/my-profile?activeTab=my-wishlists"
+          rel="noopener noreferrer"
+        >
+          My Wishlists
+        </Link>
+      ),
+      key: "4",
     },
     {
       type: "divider",
@@ -100,11 +115,12 @@ const HeaderCustom = () => {
           <IoMdLogOut color="red" size={20} />
         </Flex>
       ),
-      key: "4",
+      key: "5",
       onClick: async () => {
         await authService.logout();
         dispatch(removeUser());
         dispatch(clearCart());
+        dispatch(clearWishlist());
         router.push("/");
       },
     },
@@ -114,8 +130,8 @@ const HeaderCustom = () => {
     const res = await baseService.findAll("categories", 1, 99999, {
       active: true,
     });
-    setCategories(handleTreeValue(res.data, "parentId"));
-    setCategoriesCustom(handleTreeValueCustom(res.data, "parentId"));
+    setCategories(handleTreeValue(res?.data, "parentId"));
+    setCategoriesCustom(handleTreeValueCustom(res?.data, "parentId"));
   };
 
   useEffect(() => {
@@ -182,14 +198,14 @@ const HeaderCustom = () => {
                 label: <Link href="/about-us">About Us</Link>,
                 key: "about-us",
               },
-              {
-                label: "Blog",
-                key: "blog",
-              },
-              {
-                label: "Contact Us",
-                key: "contact-us",
-              },
+              // {
+              //   label: "Blog",
+              //   key: "blog",
+              // },
+              // {
+              //   label: "Contact Us",
+              //   key: "contact-us",
+              // },
             ]}
             mode="horizontal"
             style={{
@@ -206,6 +222,10 @@ const HeaderCustom = () => {
                 placeholder="Search..."
                 width={50}
                 style={{display: "flex", alignItems: "center"}}
+                defaultValue={(router.query.search as string) || ""}
+                onSearch={(value) => {
+                  router.push(`/shop?search=${value}`);
+                }}
               />
             </Col>
             <Col
@@ -217,8 +237,21 @@ const HeaderCustom = () => {
                 padding: "0 10px",
               }}
             >
-              <Badge count={5} style={{fontSize: 12}}>
-                <Button type="text" size="large" icon={<FiHeart size={26} />} />
+              <Badge
+                count={wishlist.length > 0 ? wishlist?.length : 0}
+                style={{fontSize: 12}}
+              >
+                <Link
+                  href={
+                    user ? "/my-profile?activeTab=my-wishlists" : "/auth/login"
+                  }
+                >
+                  <Button
+                    type="text"
+                    size="large"
+                    icon={<FiHeart size={26} />}
+                  />
+                </Link>
               </Badge>
               <Badge
                 count={cart.length > 0 ? cart?.length : 0}
@@ -327,18 +360,25 @@ const HeaderCustom = () => {
             )}
           </div>
           <Flex justify="end" align="center" gap={40}>
-            <Badge count={5} style={{fontSize: 12}}>
-              <Button type="text" size="large" icon={<FiHeart size={26} />} />
+            <Badge
+              count={wishlist.length > 0 ? wishlist?.length : 0}
+              style={{fontSize: 12}}
+            >
+              <Link href={"/my-profile?activeTab=my-wishlists"}>
+                <Button type="text" size="large" icon={<FiHeart size={26} />} />
+              </Link>
             </Badge>
             <Badge
               count={cart.length > 0 ? cart?.length : 0}
               style={{fontSize: 12}}
             >
-              <Button
-                type="text"
-                size="large"
-                icon={<FiShoppingCart size={26} />}
-              />
+              <Link href="/cart">
+                <Button
+                  type="text"
+                  size="large"
+                  icon={<FiShoppingCart size={26} />}
+                />
+              </Link>
             </Badge>
           </Flex>
         </Flex>
@@ -350,6 +390,7 @@ const HeaderCustom = () => {
           />
         </Flex>
         <Menu
+          selectedKeys={[currentPath]}
           items={[
             {
               label: <Link href="/">Home</Link>,
@@ -370,15 +411,17 @@ const HeaderCustom = () => {
           ]}
         />
         <Divider />
-        <Typography.Title level={5} style={{marginBottom: 20}}>
-          Shop
-        </Typography.Title>
+        <Link href="/shop">
+          <Typography.Title level={5} style={{marginBottom: 20}}>
+            Shop
+          </Typography.Title>
+        </Link>
         <Tree
           showLine
           switcherIcon={<FaCaretRight size={18} />}
           defaultExpandedKeys={["0-0-0"]}
           onSelect={(value) => {
-            router.push(`/shop?category=${value}`);
+            router.push(`/shop?categories=${value}`);
             setCheck(!check);
           }}
           treeData={categoriesCustom}

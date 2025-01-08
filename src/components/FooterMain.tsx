@@ -153,7 +153,7 @@ const FooterMain = () => {
                 display: "block",
               }}
             >
-              © 2024 Brand Name. All rights reserved.
+              © 2024 Simple Store. All rights reserved. Made with ❤️ by Huy Bach
             </Text>
           </Col>
           <Col>

@@ -12,6 +12,8 @@ import FooterMain from "@/components/FooterMain";
 import useCart from "@/hooks/useCart";
 import {RootState} from "@/redux/store";
 import MiniCart from "@/components/MiniCart";
+import {baseService} from "@/service/baseService";
+import {setWishlist} from "@/redux/slice/dataSlice";
 
 type RouterProps = {
   Component: AppProps["Component"];
@@ -36,6 +38,11 @@ const Routers = ({Component, pageProps}: RouterProps) => {
     }
   };
 
+  const getWishlist = async () => {
+    const wishlist = await baseService.getWishlist();
+    dispatch(setWishlist(wishlist.data));
+  };
+
   useEffect(() => {
     getMe();
     const timeout = setTimeout(() => {
@@ -48,6 +55,7 @@ const Routers = ({Component, pageProps}: RouterProps) => {
   useEffect(() => {
     if (user) {
       getCart();
+      getWishlist();
     }
   }, [user]);
 

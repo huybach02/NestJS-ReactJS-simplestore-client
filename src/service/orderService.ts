@@ -53,4 +53,20 @@ export const orderService = {
       message.error(error.response.data.message);
     }
   },
+  getCustomerOrder: async () => {
+    try {
+      return await axiosInstance.get(`orders/customer-order`);
+    } catch (error: any) {
+      message.error(error.response.data.message);
+    }
+  },
+  cancelOrder: async (id: string) => {
+    try {
+      return await axiosInstance.patch(`orders/${id}`, {
+        orderStatus: "cancelled",
+      });
+    } catch (error: any) {
+      message.error(error.response.data.message);
+    }
+  },
 };

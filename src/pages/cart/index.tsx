@@ -289,6 +289,13 @@ const Cart = () => {
         cart.filter((item) => selectedRowKeys.includes(item.id))
       )
     );
+    dispatch(
+      setDiscountAmountAndFinalTotal({
+        subTotal: calculateTotal(selectedRowKeys, cart),
+        discountAmount: 0,
+        finalTotal: calculateTotal(selectedRowKeys, cart),
+      })
+    );
     if (voucher && selectedRowKeys.length > 0) {
       handleApplyVoucher();
     }

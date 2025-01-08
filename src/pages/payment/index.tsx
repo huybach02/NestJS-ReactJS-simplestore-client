@@ -229,7 +229,6 @@ const Payment = () => {
             height: 48,
           }}
           createOrder={(data, actions) => {
-            // Kiểm tra lại một lần nữa
             if (!finalTotal || finalTotal <= 0) {
               alert("Invalid payment amount");
               return Promise.reject("Invalid payment amount");
@@ -401,10 +400,10 @@ const Payment = () => {
                 key="console"
                 size="large"
                 onClick={() => {
-                  router.push("/orders");
+                  router.push("/my-profile?activeTab=my-orders");
                 }}
               >
-                View Details Order
+                Go to My Orders
               </Button>
 
               <Button
