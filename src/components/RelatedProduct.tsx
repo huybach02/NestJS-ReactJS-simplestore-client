@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import {baseService} from "../service/baseService";
 import {ProductType} from "@/types/productType";
 import ProductCard from "./ProductCard";
-import {Col, Row, Typography} from "antd";
+import {Col, Row, Typography, Grid} from "antd";
 
 const RelatedProduct = ({
   categoryId,
@@ -11,6 +11,8 @@ const RelatedProduct = ({
   categoryId: string;
   productId: string;
 }) => {
+  const {lg} = Grid.useBreakpoint();
+
   const [relatedProduct, setRelatedProduct] = useState<ProductType[]>([]);
 
   useEffect(() => {
@@ -36,7 +38,7 @@ const RelatedProduct = ({
             {relatedProduct?.length > 0 && (
               <Row gutter={[16, 16]}>
                 {relatedProduct.map((product, index) => (
-                  <Col span={4} key={index}>
+                  <Col span={lg ? 4 : 12} key={index}>
                     <ProductCard product={product} />
                   </Col>
                 ))}

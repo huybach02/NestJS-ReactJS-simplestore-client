@@ -308,7 +308,7 @@ const ProductPage = ({product}: {product: ProductType}) => {
                     <Flex
                       gap={10}
                       align=""
-                      style={{width: 200, marginTop: -20}}
+                      style={{width: 210, marginTop: -20}}
                     >
                       <Statistic.Countdown
                         title="Sale end in:"
